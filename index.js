@@ -1,13 +1,20 @@
 
 const {Client , GatewayIntentBits} = require('discord.js')
+const express = require('express')
 const dotenv = require('dotenv')
 const axios = require('axios')
-const {getBooks} = require('./modules/books')
+const {getBooks} = require('./modules/books');
+const ServerlessHttp = require('serverless-http');
+const app = express()
+
+app.use(express.json())
+app.get('/',(req,res)=>{
+    res.send('Welcome to bot')
+})
 //GatewayIntent is to give permission
 const client = new Client({ intents: [GatewayIntentBits.Guilds ,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent] });
-
 dotenv.config()
 client.login(process.env.AUTH_TOKEN);
 
@@ -48,6 +55,10 @@ client.on('interactionCreate',async (interaction)=>{
             let num2 = interaction.options.get('second-number').value
             await interaction.reply(`The total is ${num1 + num2}`)
         case 'weather':
+            console.log(interaction.options.get('city-name'))
+            if(!interaction.options.get('city-name')){
+                await interaction.reply('No city specified!!, Please enter city name')
+            }
             let city = interaction.options.get('city-name').value
             let currWeather = await findWeather(city);
             console.log(currWeather)
@@ -120,3 +131,8 @@ try {
     throw error;
 }
 }
+
+app.listen(process.env.PORT,()=>{
+    console.log(`Server is listening to ${process.env.PORT}`)
+})
+module.exports.handler = ServerlessHttp(app)
