@@ -80,7 +80,7 @@ client.on('interactionCreate',async (interaction)=>{
             }
         case 'books':
             let queryObj={}
-            if(interaction.options.get('keyword').value){
+            if(interaction.options.get('keyword')?.value){
                 queryObj['keyword']=interaction.options.get('keyword').value
             }
             if(interaction.options.get('title')?.value){
