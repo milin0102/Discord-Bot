@@ -5,7 +5,9 @@ const dotenv = require('dotenv')
 const axios = require('axios')
 const {getBooks} = require('./modules/books');
 const ServerlessHttp = require('serverless-http');
+const mongoose = require('mongoose')
 const app = express()
+var http = require('http');
 
 app.use(express.json())
 app.get('/',(req,res)=>{
@@ -17,6 +19,15 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds ,
     GatewayIntentBits.MessageContent] });
 dotenv.config()
 client.login(process.env.AUTH_TOKEN);
+
+mongoose.connect(process.env.MONGO_URI,{
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then((res)=>{
+    console.log('connected to mongodb')
+}).catch((err)=>{
+    console.log("error while connecting.."+err)
+})
 
 client.on('messageCreate',(message)=>{
     console.log(message.author)
@@ -132,7 +143,9 @@ try {
 }
 }
 
-app.listen(process.env.PORT,()=>{
-    console.log(`Server is listening to ${process.env.PORT}`)
-})
+http.createServer(function (req, res) {
+    res.write('Welcome to bot'); //write a response to the client
+    res.end(); //end the response
+  }).listen(8080); //the server object listens on port 80
+
 module.exports.handler = ServerlessHttp(app)
